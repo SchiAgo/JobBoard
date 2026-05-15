@@ -100,6 +100,7 @@ export const authAPI = {
 // ── Jobs ─────────────────────────────────────────────────────
 export const jobsAPI = {
   getAllJobs: () => request("GET", "/jobs"),
+  getjobsPerCompany: () => request("GET", "/jobs/company-jobs"),
   createJob: (dati) => request("POST", "/jobs", dati),
   updateJob: (id, dati) => request("PATCH", `/jobs/${id}`, dati),
   deleteJob: (id) => request("DELETE", `/jobs/${id}`),

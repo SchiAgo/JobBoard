@@ -69,6 +69,25 @@ const getAllJobs = async (req, res) => {
     }
 };
 
+//
+const getJobsPerCompany = async (req, res) => {
+    try {
+        const companyId = req.user.id; // Preso dal JWT dell'azienda autenticata
+        const jobs = await jobService.getJobsPerCompany(companyId);
+        res           .json({           
+            successo: true,
+            dati: jobs
+        });
+    } catch (err) {
+        res
+            .status(500)
+            .json({
+                successo: false,
+                error: err.message
+            });
+    }
+};
+
 
 // Elimina un annuncio (Solo azienda proprietaria)
 const deleteJob = async (req, res) => {
@@ -130,6 +149,7 @@ module.exports = {
     createJob,
     getJobById,
     getAllJobs,
+    getJobsPerCompany,
     deleteJob,
     updateJob
 };

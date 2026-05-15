@@ -105,7 +105,6 @@ const findCompanyProfile = (company_id) =>
        j.*,
        u.name AS company_name,
        u.email AS company_email,
-       u.created_at AS company_since,
        COUNT(a.id) AS total_applications,
        COUNT(CASE WHEN a.status = 'inviata' THEN 1 END) AS pending_applications,
        COUNT(CASE WHEN a.status = 'accettata' THEN 1 END) AS accepted_applications,
@@ -114,7 +113,7 @@ const findCompanyProfile = (company_id) =>
      JOIN users u ON u.id = j.company_id
      LEFT JOIN applications a ON a.job_id = j.id
      WHERE j.company_id = $1
-     GROUP BY j.id, u.name, u.email, u.created_at
+     GROUP BY j.id, u.name, u.email
      ORDER BY j.created_at DESC`,
     [company_id],
   );

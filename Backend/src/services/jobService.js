@@ -19,6 +19,7 @@ const getJobById = async (id) => {
     return job;
 };
 
+//
 const getJobsPerCompany = async (companyId) => {
 
     const result = await Job.findCompanyProfile(companyId);

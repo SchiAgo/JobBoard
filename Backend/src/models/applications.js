@@ -74,6 +74,8 @@ const findByCandidateId = (candidate_id) => {
   );
 };
 
+
+
 const findByCandidateAndJob = async (candidate_id, job_id) => {
   //  const result = await pool.query(
   return pool.query(
