@@ -54,7 +54,6 @@ const findAll = () => {
   );
 };
 
-
 const findByCandidateId = (candidate_id) => {
   return pool.query(
     `SELECT
@@ -74,7 +73,31 @@ const findByCandidateId = (candidate_id) => {
   );
 };
 
-
+const FindusersByapplicationPercompany = async (company_id) => {
+  const result = await pool.query(
+    `SELECT 
+    a.id AS application_id,
+    a.job_id,
+    a.candidate_id,
+    a.status,
+    a.cover_letter,
+    a.created_at AS application_date,
+    j.title AS job_title,
+    j.description AS job_description,
+    j.contract_type,
+    j.city AS job_city,
+    j.salary,
+    u.name AS candidate_name,
+    u.email AS candidate_email
+FROM applications a
+INNER JOIN job_listings j ON a.job_id = j.id
+INNER JOIN users u ON a.candidate_id = u.id
+WHERE j.company_id = $1 
+ORDER BY a.created_at DESC`,
+    [company_id],
+  );
+  return result;
+};
 
 const findByCandidateAndJob = async (candidate_id, job_id) => {
   //  const result = await pool.query(
@@ -130,8 +153,9 @@ const updateCoverLetter = (id, { cover_letter }) => {
 };
 
 const remove = (id) => {
-  return pool.query(
-    `DELETE FROM applications WHERE id = $1 RETURNING id`, [id,]);
+  return pool.query(`DELETE FROM applications WHERE id = $1 RETURNING id`, [
+    id,
+  ]);
 };
 
 module.exports = {
@@ -140,6 +164,7 @@ module.exports = {
   findById,
   findAll,
   findByJobId,
+  FindusersByapplicationPercompany,
   findByCandidateId,
   findByCandidateAndJob,
   updateStatus,

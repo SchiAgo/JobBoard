@@ -8,8 +8,6 @@ const validate = require("../middleware/validate");
 
 const controller = require("../controllers/applicationController");
 
-
-
 const {
   autenticato,
   soloAzienda,
@@ -23,21 +21,16 @@ console.log("autenticato:", typeof autenticato);
 console.log("soloCandidato:", typeof soloCandidato);
 console.log("controller.apply:", typeof controller.apply);
 
-
 const regolaId = [
   param("id")
     .isInt({ min: 1 })
     .withMessage("L'id deve essere un numero intero positivo"),
 ];
 
-router.post('/apply',
-  autenticato,
-  soloCandidato,
-  validate,
-  controller.apply,
-);
+router.post("/apply", autenticato, soloCandidato, validate, controller.apply);
 
-router.patch('/:id/status',
+router.patch(
+  "/:id/status",
   autenticato,
   soloAzienda,
   regolaId,
@@ -45,17 +38,21 @@ router.patch('/:id/status',
   controller.updateStatus,
 );
 
-router.get('/job/:jobId',
+router.get(
+  "/job/:jobId",
   autenticato,
   soloAzienda,
   validate,
   controller.getApplicationsByJob,
 );
 
-router.get('/mine',
+router.get("/mine", autenticato, soloCandidato, controller.getMyApplications);
+
+router.get(
+  "/company-applications",
   autenticato,
-  soloCandidato,
-  controller.getMyApplications
+  soloAzienda,
+  controller.getusersByapplicationPercompany,
 );
 
 // Tutte le routes

@@ -26,6 +26,7 @@ const CompanyPage = () => {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingJobs, setLoadingJobs] = useState(false);
+  const [loadingCandidates, setLoadingCandidates] = useState(false);
   const [error, setError] = useState("");
 
   // Estados para paginação
@@ -109,7 +110,6 @@ const CompanyPage = () => {
       }
 
       //Buscando jobs do backend...
-
       const response = await fetch(
         "http://localhost:3000/api/jobs/company-jobs",
         {
@@ -155,6 +155,79 @@ const CompanyPage = () => {
     }
   };
 
+  // ========== BUSCAR CANDIDATOS DAS VAGAS DA EMPRESA ==========
+  const fetchCandidatesFromBackend = async () => {
+    setLoadingCandidates(true);
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      console.log("📢 Buscando candidatos...");
+
+      const response = await fetch(
+        "http://localhost:3000/api/applications/company-applications",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        navigate("/login");
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Erro HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      let applicationsList = [];
+
+      // Adaptando para o formato da sua API
+      if (data.successo && Array.isArray(data.dati)) {
+        applicationsList = data.dati;
+      } else if (Array.isArray(data)) {
+        applicationsList = data;
+      } else {
+        applicationsList = [];
+        console.warn("Formato inesperado:", data);
+      }
+
+      // Transformar os dados para o formato que a tabela espera
+      const formattedCandidates = applicationsList.map((app) => ({
+        id: app.application_id,
+        name: app.candidate_name,
+        email: app.candidate_email,
+        role: app.job_title,
+        date: new Date(app.application_date).toLocaleDateString("it-IT"),
+        status: app.status,
+        cover_letter: app.cover_letter,
+        job_title: app.job_title,
+        job_id: app.job_id,
+        salary: app.salary,
+        city: app.job_city,
+        application_date: app.application_date,
+      }));
+
+      console.log("📋 Candidatos formatados:", formattedCandidates);
+      setCandidates(formattedCandidates);
+    } catch (err) {
+      setError("Errore nel caricamento dei candidati");
+    } finally {
+      setLoadingCandidates(false);
+    }
+  };
+
   // ========== CREA UN NUOVO ANNUNCIO SULLA BANCA ==========
   const handleCreateJob = async () => {
     if (
@@ -183,7 +256,6 @@ const CompanyPage = () => {
       };
 
       //Creando nuovo annuncio no backend...
-
       const response = await fetch("http://localhost:3000/api/jobs", {
         method: "POST",
         headers: {
@@ -272,7 +344,8 @@ const CompanyPage = () => {
         return;
       }
 
-      await fetchJobsFromBackend();
+      await fetchJobsFromBackend(); // Carrega os jobs
+      await fetchCandidatesFromBackend(); // Carrega os candidatos
     };
 
     checkAuthAndLoad();
@@ -552,7 +625,14 @@ const CompanyPage = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredCandidates.length === 0 ? (
+              {loadingCandidates ? (
+                <tr>
+                  <td colSpan="5" className="text-center py-4">
+                    <Spinner animation="border" size="sm" variant="primary" />
+                    <p className="mt-2 text-muted">Caricamento candidati...</p>
+                  </td>
+                </tr>
+              ) : filteredCandidates.length === 0 ? (
                 <tr>
                   <td colSpan="5" className="text-center py-4">
                     <p className="text-muted mb-0">Nessun candidato trovato</p>

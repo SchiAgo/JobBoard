@@ -64,6 +64,11 @@ const getCandidatoApplications = async (candidateId) => {
     return result.rows;
 };
 
+const getusersByapplicationPercompany = async (companyId) => {
+  const result = await Application.FindusersByapplicationPercompany(companyId);
+  return result.rows;
+};
+
 const getApplicationsByJob = async (jobId, companyId) => {
 
     const job = await JobService.getJobById(jobId);
@@ -83,5 +88,6 @@ module.exports = {
     applyToJob,
     updateApplicationStatus,
     getCandidatoApplications,
+    getusersByapplicationPercompany,
     getApplicationsByJob
 };

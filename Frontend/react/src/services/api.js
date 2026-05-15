@@ -1,4 +1,3 @@
-
 // services/api.js — Livello di accesso alle API del backend
 // ============================================================
 // L'URL base viene letto dal file .env tramite import.meta.env.
@@ -74,22 +73,24 @@ export const authAPI = {
     let res;
     try {
       res = await fetch(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
     } catch {
-      throw new Error('Impossibile contattare il server. Controlla che il backend sia in esecuzione.');
+      throw new Error(
+        "Impossibile contattare il server. Controlla che il backend sia in esecuzione.",
+      );
     }
 
     const data = await res.json();
 
     if (!res.ok) {
-      throw new Error(data.errore || data.message || 'Errore login');
+      throw new Error(data.errore || data.message || "Errore login");
     }
 
     // Salva il token nel localStorage (come fa getToken())
-    localStorage.setItem('token', data.token);
+    localStorage.setItem("token", data.token);
     return data; // restituisce { token, user }
   },
 
@@ -113,4 +114,6 @@ export const applicationAPI = {
   updateStatus: (id) => request("PATCH", `/jobs/${id}/status`),
   getApplicationsByJob: (jobId) => request("GET", `/applications/job/${jobId}`),
   getMyApplications: () => request("GET", "/applications/mine"),
+  getusersByapplicationPercompany: () =>
+    request("GET", "/applications/company-applications"),
 };
